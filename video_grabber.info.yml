@@ -1,0 +1,7 @@
+name: 'Feeds video grabber'
+type: module
+description: 'Grab the video url from body and populate video URL field/fields.'
+core: 8.x
+package: 'Custom'
+dependencies:
+  - feeds

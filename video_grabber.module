@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Contains video_grabber.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_help().
+ */
+function video_grabber_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the video_grabber module.
+    case 'help.page.video_grabber':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Grab the video url from body and populate video URL field/fields.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ */
+function video_grabber_node_presave(NodeInterface $node) {
+  if ($node->bundle() == 'article') {
+    $video_url = [];
+    $body = $node->get('body')->value;
+    $src = get_iframe_src($body);
+    foreach ($src as $url) {
+      if (strpos($url, 'youtube') > 0) {
+        preg_match_all('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $matches);
+        $video_url[] = 'https://www.youtube.com/watch?v=' . $matches[1][0];
+      }
+      if (strpos($url, 'vimeo') > 0) {
+        preg_match_all('/^https?:\/\/(?:www\.|player\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)(?:[?]?.*)$/i', $url, $matches);
+        $video_url[] = 'https://vimeo.com/' . $matches[3][0];
+      }
+    }
+    $node->field_video_url = $video_url;
+  }
+}
+
+/**
+ * Helper funtion to get the iframes in the body.
+ *
+ * @param $input
+ *
+ * @return array
+ */
+function get_iframe_src($input) {
+  preg_match_all("/<iframe[^>]*src=[\"|']([^'\"]+)[\"|'][^>]*>/i", $input, $output);
+  $return = [];
+  if (isset($output[1][0])) {
+    $return = $output[1];
+  }
+  return $return;
+}

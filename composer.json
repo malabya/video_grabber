@@ -1,0 +1,14 @@
+{
+  "name": "drupal/video_grabber",
+  "type": "drupal-module",
+  "description": "Grab the video url from body and populate video URL field/fields.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/video_grabber",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/video_grabber",
+    "source": "http://cgit.drupalcode.org/video_grabber"
+  },
+  "require": { }
+}
